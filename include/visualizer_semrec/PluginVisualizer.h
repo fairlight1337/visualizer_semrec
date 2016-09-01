@@ -43,14 +43,15 @@
 // System
 #include <cstdlib>
 #include <iostream>
+#include <mutex>
 
 // Designators
 #include <designators/Designator.h>
 
 // SDL
 #include <SDL.h>
-#include <SDL2_gfxPrimitives.h>
 #include <SDL_ttf.h>
+#include <SDL2_gfxPrimitives.h>
 
 // Private
 #include <semrec/Types.h>
@@ -59,11 +60,12 @@
 #include <semrec/plugins/owlexporter/CExporterOwl.h>
 
 #include <visualizer_semrec/TreeNode.h>
+#include <visualizer_semrec/Drawable.h>
 
 
 namespace semrec {
   namespace plugins {
-    class PLUGIN_CLASS : public Plugin {
+    class PLUGIN_CLASS : public Plugin, public Drawable {
     private:
       unsigned int m_unWidth;
       unsigned int m_unHeight;
@@ -73,12 +75,11 @@ namespace semrec {
       SDL_Renderer* m_rdrRenderer;
       SDL_GLContext m_gxContext;
       
-      std::string m_strFontFile;
-      TTF_Font* m_ttfFont;
-      
       CExporterOwl* m_expOwl;
       TreeNode::Ptr m_tnTree;
       TreeNode::Ptr m_tnActive;
+      
+      std::mutex m_mtxAccess;
       
     public:
       PLUGIN_CLASS();
@@ -99,19 +100,9 @@ namespace semrec {
       
       void dispatchEvents();
       void draw();
-      void draw(SDL_Renderer* rdrRenderer);
-      
-      void drawText(SDL_Renderer* rdrRenderer, std::string strText, int nX, int nY, SDL_Color colColor, bool bCenter = false, bool bClip = false, SDL_Rect rctClip = {0, 0, 0, 0});
-      
-      SDL_Rect drawBox(SDL_Renderer* rdrRenderer, int nX, int nY, unsigned int unWidth, unsigned int unHeight, SDL_Color colColor, bool bCenter = false);
-      SDL_Rect drawBox(SDL_Renderer* rdrRenderer, SDL_Rect rctRect, SDL_Color colColor, bool bCenter = false);
-      SDL_Rect drawTextBox(SDL_Renderer* rdrRenderer, int nX, int nY, unsigned int unWidth, unsigned int unHeight, std::string strText, SDL_Color colText, SDL_Color colBackground);
-      
-      void drawLine(SDL_Renderer* rdrRenderer, int nX1, int nY1, int nX2, int nY2, SDL_Color colColor);
+      virtual void draw(SDL_Renderer* rdrRenderer) override;
       
       void drawTreeNode(SDL_Renderer* rdrRenderer, TreeNode::Ptr tnDraw, int nX, int nY);
-      
-      unsigned int textWidth(std::string strText);
     };
   }
   

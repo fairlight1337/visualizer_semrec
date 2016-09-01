@@ -7,10 +7,10 @@
 #include <vector>
 #include <string>
 
-#include <SDL/SDL.h>
+#include <visualizer_semrec/Drawable.h>
 
 
-class TreeNode : public std::enable_shared_from_this<TreeNode> {
+class TreeNode : public std::enable_shared_from_this<TreeNode>, public Drawable {
 public:
   typedef std::shared_ptr<TreeNode> Ptr;
   
@@ -22,8 +22,16 @@ private:
   unsigned int m_unWidth;
   unsigned int m_unHeight;
   
+  int m_nX;
+  int m_nY;
+  
   SDL_Color m_colText;
   SDL_Color m_colBackground;
+  
+  bool m_bSelected;
+  
+  const int m_nLevelDistance = 50;
+  const int m_nSiblingDistance = 20;
   
 protected:
 public:
@@ -42,6 +50,20 @@ public:
   
   SDL_Color textColor();
   SDL_Color backgroundColor();
+  
+  void setSelected(bool bSelected);
+  bool selected();
+  
+  void draw(SDL_Renderer* rdrRenderer) override;
+  
+  void setX(int nX);
+  int x();
+  
+  void setY(int nY);
+  int y();
+  
+  unsigned int branchWidth();
+  void recalculatePositions();
   
   template<class ... Args>
     static TreeNode::Ptr create(Args ... args) {

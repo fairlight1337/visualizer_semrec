@@ -32,7 +32,8 @@ link_directories(
 
 add_library(sr_plugin_visualizer_semrec
   src/PluginVisualizer.cpp
-  src/TreeNode.cpp)
+  src/TreeNode.cpp
+  src/Drawable.cpp)
 
 target_link_libraries(sr_plugin_visualizer_semrec
   ${catkin_LIBRARIES}

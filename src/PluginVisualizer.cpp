@@ -38,7 +38,7 @@
 
 namespace semrec {
   namespace plugins {
-    PLUGIN_CLASS::PLUGIN_CLASS() : m_ttfFont(nullptr), m_expOwl(nullptr), m_tnTree(nullptr), m_tnActive(nullptr) {
+    PLUGIN_CLASS::PLUGIN_CLASS() : m_expOwl(nullptr), m_tnTree(nullptr), m_tnActive(nullptr) {
       this->addDependency("symboliclog");
       this->setPluginVersion("0.1");
     }
@@ -57,16 +57,38 @@ namespace semrec {
     }
     
     void PLUGIN_CLASS::addTreeNode(TreeNode::Ptr tnAdd) {
-      if(!m_tnTree) {
-	m_tnTree = tnAdd;
-      } else {
-	m_tnActive->addChild(tnAdd);
+      std::lock_guard<std::mutex> lgLock(m_mtxAccess);
+      
+      if(tnAdd) {
+	if(!m_tnTree) {
+	  m_tnTree = tnAdd;
+	} else {
+	  if(!m_tnActive) {
+	    m_tnActive = m_tnTree;
+	  }
+	  
+	  m_tnActive->addChild(tnAdd);
+	}
+	
+	if(m_tnActive) {
+	  m_tnActive->setSelected(false);
+	}
+	
+	m_tnActive = tnAdd;
+	m_tnActive->setSelected(true);
       }
       
-      m_tnActive = tnAdd;
+      if(m_tnTree) {
+	m_tnTree->setX(m_unWidth / 2);
+	m_tnTree->setY(m_unHeight / 2);
+	
+	m_tnTree->recalculatePositions();
+      }
     }
     
     void PLUGIN_CLASS::leaveTreeNode() {
+      std::lock_guard<std::mutex> lgLock(m_mtxAccess);
+      
       if(m_tnActive) {
 	m_tnActive = m_tnActive->parent();
       }
@@ -83,7 +105,7 @@ namespace semrec {
       
       m_expOwl = new CExporterOwl();
       std::string strSemanticsDescriptorFile = cdConfig->stringValue("semantics-descriptor-file");
-      m_strFontFile = cdConfig->stringValue("font-file");
+      s_strFontFile = cdConfig->stringValue("font-file");
       
       if(strSemanticsDescriptorFile != "") {
 	if(m_expOwl->loadSemanticsDescriptorFile(strSemanticsDescriptorFile) == false) {
@@ -95,8 +117,8 @@ namespace semrec {
       
       if(SDL_Init(SDL_INIT_EVERYTHING) >= 0) {
 	if(TTF_Init() >= 0) {
-	  m_ttfFont = TTF_OpenFont(m_strFontFile.c_str(), 16);
-	  std::cout << TTF_GetError() << std::endl;
+	  Drawable::s_ttfFont = TTF_OpenFont(Drawable::s_strFontFile.c_str(), 16);
+	  
 	  m_unWidth =  800;
 	  m_unHeight = 600;
 	  m_strTitle = "SemRec Visualizer";
@@ -118,6 +140,8 @@ namespace semrec {
     }
     
     Result PLUGIN_CLASS::cycle() {
+      std::lock_guard<std::mutex> lgLock(m_mtxAccess);
+      
       Result resCycle = defaultResult();
       this->deployCycleData(resCycle);
       
@@ -168,116 +192,16 @@ namespace semrec {
     
     void PLUGIN_CLASS::draw(SDL_Renderer* rdrRenderer) {
       if(m_tnTree) {
+	m_tnTree->draw(rdrRenderer);
 	this->drawTreeNode(rdrRenderer, m_tnTree, m_unWidth / 2, m_unHeight / 2);
       }
     }
     
     void PLUGIN_CLASS::drawTreeNode(SDL_Renderer* rdrRenderer, TreeNode::Ptr tnDraw, int nX, int nY) {
-      const int nLevelDistance = 50;
-      const int nSiblingDistance = 20;
-      
-      this->drawTextBox(rdrRenderer, nX, nY, tnDraw->width(), tnDraw->height(), tnDraw->identifier(), tnDraw->textColor(), tnDraw->backgroundColor());
-      
-      std::vector<TreeNode::Ptr> vecChildren = tnDraw->children();
-      unsigned int unRowWidth = 0;
-      
-      for(TreeNode::Ptr tnChild : vecChildren) {
-	if(unRowWidth != 0) {
-	  unRowWidth += nSiblingDistance;
-	}
-	
-	unRowWidth + tnChild->width();
-      }
-      
-      unsigned int unOffset = nX - (unRowWidth / 2);
-      
-      for(TreeNode::Ptr tnChild : vecChildren) {
-	int nXChild = unOffset;
-	
-	this->drawTreeNode(rdrRenderer, tnChild, unOffset, nY + tnDraw->height() / 2 + tnChild->height() / 2 + nLevelDistance);
-	this->drawLine(rdrRenderer, nX, nY + tnDraw->height() / 2, unOffset, nY + tnDraw->height() / 2 + tnChild->height() / 2 + nLevelDistance - tnChild->height() / 2, {0, 128, 0, 255});
-	
-	unOffset += tnChild->width() + nSiblingDistance;
-      }
     }
     
     int PLUGIN_CLASS::branchWidth(TreeNode::Ptr tnRoot) {
       return 0;
-    }
-    
-    void PLUGIN_CLASS::drawLine(SDL_Renderer* rdrRenderer, int nX1, int nY1, int nX2, int nY2, SDL_Color colColor) {
-      lineRGBA(rdrRenderer, nX1, nY1, nX2, nY2, colColor.r, colColor.g, colColor.b, colColor.a);
-    }
-    
-    SDL_Rect PLUGIN_CLASS::drawTextBox(SDL_Renderer* rdrRenderer, int nX, int nY, unsigned int unWidth, unsigned int unHeight, std::string strText, SDL_Color colText, SDL_Color colBackground) {
-      SDL_Rect rctBox = this->drawBox(rdrRenderer, nX, nY, unWidth, unHeight, colBackground, true);
-      this->drawText(rdrRenderer, strText, nX, nY, colText, true, true, rctBox);
-      
-      return rctBox;
-    }
-    
-    void PLUGIN_CLASS::drawText(SDL_Renderer* rdrRenderer, std::string strText, int nX, int nY, SDL_Color colColor, bool bCenter, bool bClip, SDL_Rect rctClip) {
-      SDL_Surface* sfText = TTF_RenderText_Blended(m_ttfFont, strText.c_str(), colColor);
-      SDL_Texture* txText = SDL_CreateTextureFromSurface(rdrRenderer, sfText);
-      
-      SDL_Rect rctSource = {0, 0, sfText->w, sfText->h};
-      SDL_Rect rctDestination = {nX, nY, sfText->w, sfText->h};
-      
-      if(bCenter) {
-	rctDestination.x -= rctDestination.w / 2;
-	rctDestination.y -= rctDestination.h / 2;
-      }
-      
-      if(bClip) {
-	if(rctDestination.x < rctClip.x) {
-	  rctSource.x += rctClip.x - rctDestination.x;
-	  rctDestination.x = rctClip.x;
-	}
-	
-	if(rctDestination.x + rctDestination.w > rctClip.x + rctClip.w) {
-	  rctSource.w -= (rctDestination.x + rctDestination.w) - (rctClip.x + rctClip.w);
-	  rctDestination.w = rctClip.w;
-	}
-	
-	if(rctDestination.y < rctClip.y) {
-	  rctSource.y += rctClip.y - rctDestination.y;
-	  rctDestination.y = rctClip.y;
-	}
-	
-	if(rctDestination.y + rctDestination.h > rctClip.y + rctClip.h) {
-	  rctSource.h -= (rctDestination.y + rctDestination.h) - (rctClip.y + rctClip.h);
-	  rctDestination.h = rctClip.h;
-	}
-      }
-      
-      SDL_RenderCopy(rdrRenderer, txText, &rctSource, &rctDestination); 
-      
-      SDL_FreeSurface(sfText);
-      SDL_DestroyTexture(txText);
-    }
-    
-    SDL_Rect PLUGIN_CLASS::drawBox(SDL_Renderer* rdrRenderer, int nX, int nY, unsigned int unWidth, unsigned int unHeight, SDL_Color colColor, bool bCenter) {
-      return this->drawBox(rdrRenderer, {nX, nY, (int)unWidth, (int)unHeight}, colColor, bCenter);
-    }
-    
-    SDL_Rect PLUGIN_CLASS::drawBox(SDL_Renderer* rdrRenderer, SDL_Rect rctRect, SDL_Color colColor, bool bCenter) {
-      if(bCenter) {
-	rctRect.x -= rctRect.w / 2;
-	rctRect.y -= rctRect.h / 2;
-      }
-      
-      boxRGBA(rdrRenderer, rctRect.x, rctRect.y, rctRect.x + rctRect.w, rctRect.y + rctRect.h, colColor.r, colColor.g, colColor.b, colColor.a);
-      
-      return rctRect;
-    }
-    
-    unsigned int PLUGIN_CLASS::textWidth(std::string strText) {
-      SDL_Surface* sfText = TTF_RenderText_Blended(m_ttfFont, strText.c_str(), {0, 0, 0, 0});
-      unsigned int unTextWidth = sfText->w;
-      
-      SDL_FreeSurface(sfText);
-      
-      return unTextWidth;
     }
   }
   
