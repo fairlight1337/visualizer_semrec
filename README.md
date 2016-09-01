@@ -1,4 +1,5 @@
-===== Visualizer Plugin for SemRec
+Visualizer Plugin for SemRec
+============================
 
 This plugin visualizes the live construction of a symbolic task tree from within SemRec. The plugin is in its infancy still, but the following things work already:
 
@@ -13,6 +14,7 @@ This plugin visualizes the live construction of a symbolic task tree from within
 The display of the tree itself is still suboptimal at the moment, but I'm working on that. This should be fixed quite shortly.
 
 
-=== Example
+Example
+-------
 
 ![Sample display of SemRec Visualizer](http://robots-doing-things.com/img/visualizer.png)
