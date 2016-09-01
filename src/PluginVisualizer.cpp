@@ -61,6 +61,10 @@ namespace semrec {
     void PLUGIN_CLASS::addTreeNode(TreeNode::Ptr tnAdd) {
       std::lock_guard<std::mutex> lgLock(m_mtxAccess);
       
+      if(m_tnActive) {
+	m_tnActive->setSelected(false);
+      }
+      
       if(tnAdd) {
 	if(!m_tnTree) {
 	  m_tnTree = tnAdd;
@@ -70,10 +74,6 @@ namespace semrec {
 	  }
 	  
 	  m_tnActive->addChild(tnAdd);
-	}
-	
-	if(m_tnActive) {
-	  m_tnActive->setSelected(false);
 	}
 	
 	m_tnActive = tnAdd;
@@ -92,7 +92,13 @@ namespace semrec {
       std::lock_guard<std::mutex> lgLock(m_mtxAccess);
       
       if(m_tnActive) {
+	m_tnActive->setSelected(false);
+	
 	m_tnActive = m_tnActive->parent();
+	
+	if(m_tnActive) {
+	  m_tnActive->setSelected(true);
+	}
       }
     }
     
