@@ -195,9 +195,9 @@ namespace semrec {
 	int nXChild = unOffset;
 	
 	this->drawTreeNode(rdrRenderer, tnChild, unOffset, nY + tnDraw->height() / 2 + tnChild->height() / 2 + nLevelDistance);
-	unOffset += tnChild->width() + nSiblingDistance;
+	this->drawLine(rdrRenderer, nX, nY + tnDraw->height() / 2, unOffset, nY + tnDraw->height() / 2 + tnChild->height() / 2 + nLevelDistance - tnChild->height() / 2, {0, 128, 0, 255});
 	
-	//this->drawLine(rdrRenderer, nX, nY + unNodeHeight / 2, nXChild, nYChild - unNodeHeight / 2, {0, 128, 0, 255});
+	unOffset += tnChild->width() + nSiblingDistance;
       }
     }
     
