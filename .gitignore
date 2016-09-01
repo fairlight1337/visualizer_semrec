@@ -1,0 +1,10 @@
+*#
+*~
+3rdparty/SDL2-2.0.3/
+3rdparty/SDL2_gfx-1.0.1/
+3rdparty/SDL2_image-2.0.0/
+3rdparty/SDL2_ttf-2.0.12/
+3rdparty/freetype-2.6/
+3rdparty/lua-5.3.1/
+3rdparty/scripts/
+3rdparty/tinyxml2-3.0.0/
