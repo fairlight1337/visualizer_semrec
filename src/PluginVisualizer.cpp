@@ -50,7 +50,9 @@ namespace semrec {
     }
     
     TreeNode::Ptr PLUGIN_CLASS::addTreeNode(std::string strIdentifier) {
-      TreeNode::Ptr tnAdd = TreeNode::create(strIdentifier, this->textWidth(strIdentifier) + 10);
+      unsigned int unWidth = 200; // this->textWidth(strIdentifier) + 10
+      
+      TreeNode::Ptr tnAdd = TreeNode::create(strIdentifier, unWidth);
       this->addTreeNode(tnAdd);
       
       return tnAdd;
