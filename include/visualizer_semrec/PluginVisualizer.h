@@ -81,6 +81,8 @@ namespace semrec {
       
       std::mutex m_mtxAccess;
       
+      double m_dZoom;
+      
     public:
       PLUGIN_CLASS();
       ~PLUGIN_CLASS();

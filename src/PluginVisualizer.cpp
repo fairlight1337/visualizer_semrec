@@ -38,7 +38,7 @@
 
 namespace semrec {
   namespace plugins {
-    PLUGIN_CLASS::PLUGIN_CLASS() : m_expOwl(nullptr), m_tnTree(nullptr), m_tnActive(nullptr) {
+    PLUGIN_CLASS::PLUGIN_CLASS() : m_expOwl(nullptr), m_tnTree(nullptr), m_tnActive(nullptr), m_dZoom(0.75) {
       this->addDependency("symboliclog");
       this->setPluginVersion("0.1");
     }
@@ -184,6 +184,7 @@ namespace semrec {
       SDL_Event evEvent;
       
       if(SDL_PollEvent(&evEvent)) {
+	// ...
       }
     }
     
@@ -193,7 +194,26 @@ namespace semrec {
       SDL_SetRenderDrawColor(m_rdrRenderer, 0, 0, 0, 255);
       SDL_RenderClear(m_rdrRenderer);
       
+      unsigned int unWidth = m_unWidth / m_dZoom;
+      unsigned int unHeight = m_unHeight / m_dZoom;
+      
+      SDL_Texture* txTransformable = SDL_CreateTexture(m_rdrRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, unWidth, unHeight);
+      SDL_SetRenderTarget(m_rdrRenderer, txTransformable);
+      SDL_SetRenderDrawColor(m_rdrRenderer, 0, 0, 0, 255);
+      SDL_RenderClear(m_rdrRenderer);
+      
       this->draw(m_rdrRenderer);
+      
+      SDL_SetRenderTarget(m_rdrRenderer, NULL);
+      
+      SDL_Rect rctAll;
+      rctAll.x = (unWidth - m_unWidth) / 4;
+      rctAll.y = (unHeight - m_unHeight) / 4;
+      rctAll.w = m_unWidth;
+      rctAll.h = m_unHeight;
+      
+      SDL_RenderCopy(m_rdrRenderer, txTransformable, NULL, &rctAll);
+      SDL_DestroyTexture(txTransformable);
       
       SDL_RenderPresent(m_rdrRenderer);
     }
