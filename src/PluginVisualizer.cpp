@@ -77,6 +77,7 @@ namespace semrec {
 	  }
 	  
 	  m_tnActive->addChild(tnAdd);
+	  tnAdd->setState({(double)m_tnActive->x(), (double)m_tnActive->y(), 0, 0});
 	}
 	
 	m_tnActive = tnAdd;
@@ -87,6 +88,10 @@ namespace semrec {
 	m_s2State.v2Position = {(double)m_szSize.dW / 2, (double)m_szSize.dH / 2};
 	
 	m_tnTree->recalculatePositions();
+      }
+      
+      if(m_tnActive) {
+	this->setViewport({(double)(m_tnActive->x() - (int)m_tnActive->width()), (double)(m_tnActive->y() - (int)m_tnActive->height()), (double)(m_tnActive->width() * 2), (double)(m_tnActive->height() * 2)});
       }
     }
     
@@ -315,16 +320,16 @@ namespace semrec {
     }
     
     void PLUGIN_CLASS::setViewport(Physics::Rectangle rcViewport) {
-      double dZoomH = rcViewport.szSize.dW / m_szSize.dW;
-      double dZoomV = rcViewport.szSize.dH / m_szSize.dH;
+      double dZoomH = m_szSize.dW / rcViewport.szSize.dW;
+      double dZoomV = m_szSize.dH / rcViewport.szSize.dH;
       
-      double dZoom = (dZoomH > dZoomV ? dZoomH : dZoomV);
+      double dZoom = (dZoomH < dZoomV ? dZoomH : dZoomV);
       
-      double dX = rcViewport.ptOrigin.dX + rcViewport.szSize.dW / 2;
-      double dY = rcViewport.ptOrigin.dY + rcViewport.szSize.dH / 2;
+      double dX = rcViewport.ptOrigin.dX + rcViewport.szSize.dW / 2 - m_s2State.v2Position.dX / 2;
+      double dY = rcViewport.ptOrigin.dY + rcViewport.szSize.dH / 2 - m_s2State.v2Position.dY / 2;
       
       this->setZoom(dZoom);
-      this->setPosition({dX, dY});
+      this->setPosition({-dX, -dY});
     }
   }
   
