@@ -12,6 +12,8 @@
 #include <SDL_ttf.h>
 #include <SDL2_gfxPrimitives.h>
 
+#include <visualizer_semrec/Physics.h>
+
 
 class Drawable {
 public:
@@ -33,7 +35,7 @@ public:
     return std::make_shared<Drawable>(std::forward<Args>(args)...);
   }
   
-  virtual void draw(SDL_Renderer* rdrRenderer) = 0;
+  virtual void draw(SDL_Renderer* rdrRenderer, Physics::Vector2D v2Offset) = 0;
   
   void drawText(SDL_Renderer* rdrRenderer, std::string strText, int nX, int nY, SDL_Color colColor, bool bCenter = false, bool bClip = false, SDL_Rect rctClip = {0, 0, 0, 0});
   

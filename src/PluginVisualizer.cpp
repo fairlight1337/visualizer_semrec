@@ -38,7 +38,7 @@
 
 namespace semrec {
   namespace plugins {
-    PLUGIN_CLASS::PLUGIN_CLASS() : m_expOwl(nullptr), m_tnTree(nullptr), m_tnActive(nullptr), m_dZoom(0.75), m_s2State({{0, 0}, {0, 0}}) {
+    PLUGIN_CLASS::PLUGIN_CLASS() : m_expOwl(nullptr), m_tnTree(nullptr), m_tnActive(nullptr), m_dZoom(1.0), m_s2State({{0, 0}, {0, 0}}), m_unDragButton(0) {
       this->addDependency("symboliclog");
       this->setPluginVersion("0.1");
     }
@@ -81,8 +81,7 @@ namespace semrec {
       }
       
       if(m_tnTree) {
-	m_tnTree->setX(m_unWidth / 2);
-	m_tnTree->setY(m_unHeight / 2);
+	m_s2State.v2Position = {(double)m_unWidth / 2, (double)m_unHeight / 2};
 	
 	m_tnTree->recalculatePositions();
       }
@@ -115,6 +114,8 @@ namespace semrec {
       std::string strSemanticsDescriptorFile = cdConfig->stringValue("semantics-descriptor-file");
       s_strFontFile = cdConfig->stringValue("font-file");
       
+      bool bStartMinimized = (cdConfig->stringValue("start-minimized") == "1");
+      
       if(strSemanticsDescriptorFile != "") {
 	if(m_expOwl->loadSemanticsDescriptorFile(strSemanticsDescriptorFile) == false) {
 	  this->warn("Failed to load semantics descriptor file '" + strSemanticsDescriptorFile + "'.");
@@ -135,6 +136,13 @@ namespace semrec {
 	  m_rdrRenderer = SDL_CreateRenderer(m_swnWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 	  
 	  m_gxContext = SDL_GL_GetCurrentContext();
+	  
+	  if(bStartMinimized) {
+	    SDL_MinimizeWindow(m_swnWindow);
+	  }
+	  
+	  //SDL_Rect rctViewport = {(int)m_unWidth / 2, (int)m_unHeight / 2, (int)m_unWidth, (int)m_unHeight};
+	  //SDL_RenderSetViewport(m_rdrRenderer, &rctViewport);
 	  
 	  this->addTreeNode("knowrob:RootElement");
 	}
@@ -192,6 +200,36 @@ namespace semrec {
       
       if(SDL_PollEvent(&evEvent)) {
 	switch(evEvent.type) {
+	case SDL_MOUSEBUTTONDOWN: {
+	  m_mapMouseButtons[evEvent.button.button] = true;
+	} break;
+	  
+	case SDL_MOUSEBUTTONUP: {
+	  m_mapMouseButtons[evEvent.button.button] = false;
+	  
+	  if(m_unDragButton == evEvent.button.button) {
+	    m_unDragButton = 0;
+	  }
+	} break;
+	  
+	case SDL_MOUSEMOTION: {
+	  if(m_unDragButton == 0) {
+	    if(m_mapMouseButtons[SDL_BUTTON_LEFT]) {
+	      m_unDragButton = SDL_BUTTON_LEFT;
+	    } else if(m_mapMouseButtons[SDL_BUTTON_RIGHT]) {
+	      m_unDragButton = SDL_BUTTON_RIGHT;
+	    }
+	    
+	    if(m_unDragButton != 0) {
+	      m_v2DragStart = {(double)evEvent.button.x, (double)evEvent.button.y};
+	    }
+	  }
+	  
+	  if(m_unDragButton != 0) {
+	    this->updateDrag(m_unDragButton, {(double)evEvent.button.x, (double)evEvent.button.y});
+	  }
+	} break;
+	  
 	case SDL_MOUSEWHEEL: {
 	  double dFactor = 0.1;
 	  
@@ -210,38 +248,34 @@ namespace semrec {
       SDL_SetRenderDrawColor(m_rdrRenderer, 0, 0, 0, 255);
       SDL_RenderClear(m_rdrRenderer);
       
-      unsigned int unWidth = m_unWidth / m_dZoom;
-      unsigned int unHeight = m_unHeight / m_dZoom;
-      
-      SDL_Texture* txTransformable = SDL_CreateTexture(m_rdrRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, unWidth, unHeight);
-      SDL_SetRenderTarget(m_rdrRenderer, txTransformable);
-      SDL_SetRenderDrawColor(m_rdrRenderer, 0, 0, 0, 255);
-      SDL_RenderClear(m_rdrRenderer);
-      
-      this->draw(m_rdrRenderer);
-      
-      SDL_SetRenderTarget(m_rdrRenderer, NULL);
-      
-      SDL_Rect rctAll;
-      rctAll.x = (unWidth - m_unWidth) / 4;
-      rctAll.y = (unHeight - m_unHeight) / 4;
-      rctAll.w = m_unWidth;
-      rctAll.h = m_unHeight;
-      
-      SDL_RenderCopy(m_rdrRenderer, txTransformable, NULL, &rctAll);
-      SDL_DestroyTexture(txTransformable);
+      this->draw(m_rdrRenderer, m_s2State.v2Position);
       
       SDL_RenderPresent(m_rdrRenderer);
     }
     
-    void PLUGIN_CLASS::draw(SDL_Renderer* rdrRenderer) {
+    void PLUGIN_CLASS::draw(SDL_Renderer* rdrRenderer, Physics::Vector2D v2Offset) {
       if(m_tnTree) {
-	m_tnTree->draw(rdrRenderer);
+	m_tnTree->draw(rdrRenderer, v2Offset);
       }
     }
     
     void PLUGIN_CLASS::setZoom(double dZoom) {
+      if(dZoom < 0.1) {
+	dZoom = 0.1;
+      } else if(dZoom > 2.0) {
+	dZoom = 2.0;
+      }
+      
+      double dFormerZoom = m_dZoom;
       m_dZoom = dZoom;
+      
+      int nWidth = (int)m_unWidth;
+      int nHeight = (int)m_unHeight;
+      
+      SDL_RenderSetScale(m_rdrRenderer, dZoom, dZoom);
+      
+      m_s2State.v2Position.dX = (m_s2State.v2Position.dX * dFormerZoom) / dZoom;
+      m_s2State.v2Position.dY = (m_s2State.v2Position.dY * dFormerZoom) / dZoom;
     }
     
     double PLUGIN_CLASS::zoom() {
@@ -262,6 +296,13 @@ namespace semrec {
     
     Physics::Vector2D PLUGIN_CLASS::velocity() {
       return m_s2State.v2Velocity;
+    }
+    
+    void PLUGIN_CLASS::updateDrag(unsigned int unButton, Physics::Vector2D v2Position) {
+      m_s2State.v2Position.dX += (v2Position.dX - m_v2DragStart.dX) / m_dZoom;
+      m_s2State.v2Position.dY += (v2Position.dY - m_v2DragStart.dY) / m_dZoom;
+      
+      m_v2DragStart = v2Position;
     }
   }
   

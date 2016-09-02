@@ -54,7 +54,7 @@ public:
   void setSelected(bool bSelected);
   bool selected();
   
-  void draw(SDL_Renderer* rdrRenderer) override;
+  void draw(SDL_Renderer* rdrRenderer, Physics::Vector2D v2Offset) override;
   
   void setX(int nX);
   int x();

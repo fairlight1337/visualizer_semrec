@@ -52,7 +52,7 @@ bool TreeNode::selected() {
   return m_bSelected;
 }
 
-void TreeNode::draw(SDL_Renderer* rdrRenderer) {
+void TreeNode::draw(SDL_Renderer* rdrRenderer, Physics::Vector2D v2Offset) {
   SDL_Color colBackground;
   
   if(this->selected()) {
@@ -61,7 +61,7 @@ void TreeNode::draw(SDL_Renderer* rdrRenderer) {
     colBackground = this->backgroundColor();
   }
   
-  this->drawTextBox(rdrRenderer, this->x(), this->y(), this->width(), this->height(), this->identifier(), this->textColor(), colBackground);
+  this->drawTextBox(rdrRenderer, this->x() + v2Offset.dX, this->y() + v2Offset.dY, this->width(), this->height(), this->identifier(), this->textColor(), colBackground);
   
   unsigned int unRowWidth = 0;
   
@@ -78,8 +78,8 @@ void TreeNode::draw(SDL_Renderer* rdrRenderer) {
   for(TreeNode::Ptr tnChild : m_vecChildren) {
     int nXChild = unOffset;
     
-    tnChild->draw(rdrRenderer);
-    this->drawLine(rdrRenderer, this->x(), this->y() + this->height() / 2, tnChild->x(), tnChild->y() - tnChild->height() / 2, {0, 128, 0, 255});
+    tnChild->draw(rdrRenderer, v2Offset);
+    this->drawLine(rdrRenderer, this->x() + v2Offset.dX, this->y() + this->height() / 2 + v2Offset.dY, tnChild->x() + v2Offset.dX, tnChild->y() - tnChild->height() / 2 + v2Offset.dY, {0, 128, 0, 255});
   }
 }
 

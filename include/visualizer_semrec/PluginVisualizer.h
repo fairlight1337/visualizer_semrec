@@ -86,6 +86,11 @@ namespace semrec {
       
       Physics::State2D m_s2State;
       
+      std::map<unsigned int, bool> m_mapMouseButtons;
+      unsigned int m_unDragButton;
+      
+      Physics::Vector2D m_v2DragStart;
+      
     public:
       PLUGIN_CLASS();
       ~PLUGIN_CLASS();
@@ -105,7 +110,7 @@ namespace semrec {
       
       void dispatchEvents();
       void draw();
-      virtual void draw(SDL_Renderer* rdrRenderer) override;
+      virtual void draw(SDL_Renderer* rdrRenderer, Physics::Vector2D v2Offset) override;
       
       void setZoom(double dZoom);
       double zoom();
@@ -115,6 +120,8 @@ namespace semrec {
       
       void setVelocity(Physics::Vector2D v2Velocity);
       Physics::Vector2D velocity();
+      
+      void updateDrag(unsigned int unButton, Physics::Vector2D v2Position);
     };
   }
   
