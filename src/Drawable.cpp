@@ -85,3 +85,10 @@ unsigned int Drawable::textWidth(std::string strText) {
       
   return unTextWidth;
 }
+
+double Drawable::getSystemTimeStampPrecise() {
+  auto now = std::chrono::high_resolution_clock::now();
+  auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+  
+  return (double)(millis / 1000.0);
+}

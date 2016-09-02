@@ -5,6 +5,7 @@
 // System
 #include <memory>
 #include <iostream>
+#include <chrono>
 
 // SDL
 #include <SDL.h>
@@ -41,6 +42,8 @@ public:
   void drawLine(SDL_Renderer* rdrRenderer, int nX1, int nY1, int nX2, int nY2, SDL_Color colColor);
       
   unsigned int textWidth(std::string strText);
+  
+  double getSystemTimeStampPrecise();
 };
 
 

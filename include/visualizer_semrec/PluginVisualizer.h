@@ -61,6 +61,7 @@
 
 #include <visualizer_semrec/TreeNode.h>
 #include <visualizer_semrec/Drawable.h>
+#include <visualizer_semrec/Physics.h>
 
 
 namespace semrec {
@@ -82,6 +83,8 @@ namespace semrec {
       std::mutex m_mtxAccess;
       
       double m_dZoom;
+      
+      Physics::State2D m_s2State;
       
     public:
       PLUGIN_CLASS();
@@ -105,6 +108,15 @@ namespace semrec {
       virtual void draw(SDL_Renderer* rdrRenderer) override;
       
       void drawTreeNode(SDL_Renderer* rdrRenderer, TreeNode::Ptr tnDraw, int nX, int nY);
+      
+      void setZoom(double dZoom);
+      double zoom();
+      
+      void setPosition(Physics::Vector2D v2Position);
+      Physics::Vector2D position();
+      
+      void setVelocity(Physics::Vector2D v2Velocity);
+      Physics::Vector2D velocity();
     };
   }
   

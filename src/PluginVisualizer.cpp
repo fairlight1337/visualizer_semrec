@@ -38,7 +38,7 @@
 
 namespace semrec {
   namespace plugins {
-    PLUGIN_CLASS::PLUGIN_CLASS() : m_expOwl(nullptr), m_tnTree(nullptr), m_tnActive(nullptr), m_dZoom(0.75) {
+    PLUGIN_CLASS::PLUGIN_CLASS() : m_expOwl(nullptr), m_tnTree(nullptr), m_tnActive(nullptr), m_dZoom(0.75), m_s2State({{0, 0}, {0, 0}}) {
       this->addDependency("symboliclog");
       this->setPluginVersion("0.1");
     }
@@ -225,11 +225,28 @@ namespace semrec {
       }
     }
     
-    void PLUGIN_CLASS::drawTreeNode(SDL_Renderer* rdrRenderer, TreeNode::Ptr tnDraw, int nX, int nY) {
+    void PLUGIN_CLASS::setZoom(double dZoom) {
+      m_dZoom = dZoom;
     }
     
-    int PLUGIN_CLASS::branchWidth(TreeNode::Ptr tnRoot) {
-      return 0;
+    double PLUGIN_CLASS::zoom() {
+      return m_dZoom;
+    }
+    
+    void PLUGIN_CLASS::setPosition(Physics::Vector2D v2Position) {
+      m_s2State.v2Position = v2Position;
+    }
+    
+    Physics::Vector2D PLUGIN_CLASS::position() {
+      return m_s2State.v2Position;
+    }
+    
+    void PLUGIN_CLASS::setVelocity(Physics::Vector2D v2Velocity) {
+      m_s2State.v2Velocity = v2Velocity;
+    }
+    
+    Physics::Vector2D PLUGIN_CLASS::velocity() {
+      return m_s2State.v2Velocity;
     }
   }
   
