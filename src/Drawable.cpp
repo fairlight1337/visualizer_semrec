@@ -12,7 +12,7 @@ Drawable::~Drawable() {
 }
 
 void Drawable::drawLine(SDL_Renderer* rdrRenderer, int nX1, int nY1, int nX2, int nY2, SDL_Color colColor) {
-  lineRGBA(rdrRenderer, nX1, nY1, nX2, nY2, colColor.r, colColor.g, colColor.b, colColor.a);
+  aalineRGBA(rdrRenderer, nX1, nY1, nX2, nY2, colColor.r, colColor.g, colColor.b, colColor.a);
 }
     
 SDL_Rect Drawable::drawTextBox(SDL_Renderer* rdrRenderer, int nX, int nY, unsigned int unWidth, unsigned int unHeight, std::string strText, SDL_Color colText, SDL_Color colBackground) {
