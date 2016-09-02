@@ -191,7 +191,16 @@ namespace semrec {
       SDL_Event evEvent;
       
       if(SDL_PollEvent(&evEvent)) {
-	// ...
+	switch(evEvent.type) {
+	case SDL_MOUSEWHEEL: {
+	  double dFactor = 0.1;
+	  
+	  this->setZoom(this->zoom() + evEvent.wheel.y * dFactor);
+	} break;
+	  
+	default: {
+	} break;
+	}
       }
     }
     

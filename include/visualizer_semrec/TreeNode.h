@@ -23,9 +23,6 @@ private:
   unsigned int m_unWidth;
   unsigned int m_unHeight;
   
-  int m_nX;
-  int m_nY;
-  
   SDL_Color m_colText;
   SDL_Color m_colBackground;
   

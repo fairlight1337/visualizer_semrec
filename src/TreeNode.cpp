@@ -61,7 +61,7 @@ void TreeNode::draw(SDL_Renderer* rdrRenderer) {
     colBackground = this->backgroundColor();
   }
   
-  this->drawTextBox(rdrRenderer, m_nX, m_nY, this->width(), this->height(), this->identifier(), this->textColor(), colBackground);
+  this->drawTextBox(rdrRenderer, this->x(), this->y(), this->width(), this->height(), this->identifier(), this->textColor(), colBackground);
   
   unsigned int unRowWidth = 0;
   
@@ -73,13 +73,13 @@ void TreeNode::draw(SDL_Renderer* rdrRenderer) {
     unRowWidth + tnChild->width();
   }
   
-  unsigned int unOffset = m_nX - (unRowWidth / 2);
+  unsigned int unOffset = this->x() - (unRowWidth / 2);
   
   for(TreeNode::Ptr tnChild : m_vecChildren) {
     int nXChild = unOffset;
     
     tnChild->draw(rdrRenderer);
-    this->drawLine(rdrRenderer, m_nX, m_nY + this->height() / 2, tnChild->x(), tnChild->y() - tnChild->height() / 2, {0, 128, 0, 255});
+    this->drawLine(rdrRenderer, this->x(), this->y() + this->height() / 2, tnChild->x(), tnChild->y() - tnChild->height() / 2, {0, 128, 0, 255});
   }
 }
 
@@ -129,10 +129,10 @@ void TreeNode::recalculatePositions() {
     TreeNode::Ptr tnChild = m_vecChildren[unI];
     unsigned int unChildSize = vecSizes[unI];
     
-    tnChild->setX(m_nX + unOffset - unSize / 2 + unChildSize / 2);
+    tnChild->setX(this->x() + unOffset - unSize / 2 + unChildSize / 2);
     unOffset += unChildSize + m_nSiblingDistance;
     
-    tnChild->setY(m_nY + m_nLevelDistance);
+    tnChild->setY(this->y() + m_nLevelDistance);
     
     tnChild->recalculatePositions();
   }
