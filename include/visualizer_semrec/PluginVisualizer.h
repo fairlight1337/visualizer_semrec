@@ -44,6 +44,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <mutex>
+#include <time.h>
 
 // Designators
 #include <designators/Designator.h>
@@ -68,8 +69,7 @@ namespace semrec {
   namespace plugins {
     class PLUGIN_CLASS : public Plugin, public Drawable {
     private:
-      unsigned int m_unWidth;
-      unsigned int m_unHeight;
+      Physics::Size2D m_szSize;
       std::string m_strTitle;
       
       SDL_Window* m_swnWindow;
@@ -122,6 +122,8 @@ namespace semrec {
       Physics::Vector2D velocity();
       
       void updateDrag(unsigned int unButton, Physics::Vector2D v2Position);
+      
+      void setViewport(Physics::Rectangle rcViewport);
     };
   }
   

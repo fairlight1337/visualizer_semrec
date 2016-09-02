@@ -20,6 +20,21 @@ public:
     Vector2D v2Velocity;
   } State2D;
   
+  typedef struct {
+    double dX;
+    double dY;
+  } Point2D;
+  
+  typedef struct {
+    double dW;
+    double dH;
+  } Size2D;
+  
+  typedef struct {
+    Point2D ptOrigin;
+    Size2D szSize;
+  } Rectangle;
+  
 private:
 protected:
 public:

@@ -84,7 +84,7 @@ namespace semrec {
       }
       
       if(m_tnTree) {
-	m_s2State.v2Position = {(double)m_unWidth / 2, (double)m_unHeight / 2};
+	m_s2State.v2Position = {(double)m_szSize.dW / 2, (double)m_szSize.dH / 2};
 	
 	m_tnTree->recalculatePositions();
       }
@@ -131,11 +131,10 @@ namespace semrec {
 	if(TTF_Init() >= 0) {
 	  Drawable::s_ttfFont = TTF_OpenFont(Drawable::s_strFontFile.c_str(), 14);
 	  
-	  m_unWidth =  800;
-	  m_unHeight = 600;
+	  m_szSize = {800, 600};
 	  m_strTitle = "SemRec Visualizer";
 	  
-	  m_swnWindow = SDL_CreateWindow(m_strTitle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_unWidth, m_unHeight, SDL_WINDOW_SHOWN);
+	  m_swnWindow = SDL_CreateWindow(m_strTitle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_szSize.dW, m_szSize.dH, SDL_WINDOW_SHOWN);
 	  m_rdrRenderer = SDL_CreateRenderer(m_swnWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 	  
 	  m_gxContext = SDL_GL_GetCurrentContext();
@@ -143,9 +142,6 @@ namespace semrec {
 	  if(bStartMinimized) {
 	    SDL_MinimizeWindow(m_swnWindow);
 	  }
-	  
-	  //SDL_Rect rctViewport = {(int)m_unWidth / 2, (int)m_unHeight / 2, (int)m_unWidth, (int)m_unHeight};
-	  //SDL_RenderSetViewport(m_rdrRenderer, &rctViewport);
 	  
 	  this->addTreeNode("knowrob:RootElement");
 	}
@@ -282,8 +278,8 @@ namespace semrec {
       double dFormerZoom = m_dZoom;
       m_dZoom = dZoom;
       
-      int nWidth = (int)m_unWidth;
-      int nHeight = (int)m_unHeight;
+      int nWidth = (int)m_szSize.dW;
+      int nHeight = (int)m_szSize.dH;
       
       SDL_RenderSetScale(m_rdrRenderer, dZoom, dZoom);
       
@@ -316,6 +312,19 @@ namespace semrec {
       m_s2State.v2Position.dY += (v2Position.dY - m_v2DragStart.dY) / m_dZoom;
       
       m_v2DragStart = v2Position;
+    }
+    
+    void PLUGIN_CLASS::setViewport(Physics::Rectangle rcViewport) {
+      double dZoomH = rcViewport.szSize.dW / m_szSize.dW;
+      double dZoomV = rcViewport.szSize.dH / m_szSize.dH;
+      
+      double dZoom = (dZoomH > dZoomV ? dZoomH : dZoomV);
+      
+      double dX = rcViewport.ptOrigin.dX + rcViewport.szSize.dW / 2;
+      double dY = rcViewport.ptOrigin.dY + rcViewport.szSize.dH / 2;
+      
+      this->setZoom(dZoom);
+      this->setPosition({dX, dY});
     }
   }
   
