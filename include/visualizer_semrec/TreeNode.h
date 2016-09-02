@@ -35,7 +35,7 @@ private:
   
 protected:
 public:
-  TreeNode(std::string strIdentifier, unsigned int unWidth = 200, unsigned int unHeight = 30, SDL_Color colText = {255, 255, 255, 255}, SDL_Color colBackground = {0, 128, 0, 255});
+  TreeNode(std::string strIdentifier, unsigned int unWidth = 200, unsigned int unHeight = 30, SDL_Color colText = {0, 0, 0, 255}, SDL_Color colBackground = {128, 255, 128, 255});
   ~TreeNode();
   
   void setParent(TreeNode::Ptr tnParent);

@@ -71,8 +71,11 @@ SDL_Rect Drawable::drawBox(SDL_Renderer* rdrRenderer, SDL_Rect rctRect, SDL_Colo
     rctRect.x -= rctRect.w / 2;
     rctRect.y -= rctRect.h / 2;
   }
-      
-  boxRGBA(rdrRenderer, rctRect.x, rctRect.y, rctRect.x + rctRect.w, rctRect.y + rctRect.h, colColor.r, colColor.g, colColor.b, colColor.a);
+  
+  int nRadius = 5;
+  
+  roundedBoxRGBA(rdrRenderer, rctRect.x, rctRect.y, rctRect.x + rctRect.w, rctRect.y + rctRect.h, nRadius, colColor.r, colColor.g, colColor.b, colColor.a);
+  roundedRectangleRGBA(rdrRenderer, rctRect.x, rctRect.y, rctRect.x + rctRect.w, rctRect.y + rctRect.h, nRadius, 0, 0, 0, colColor.a);
       
   return rctRect;
 }

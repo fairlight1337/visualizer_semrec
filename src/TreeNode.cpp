@@ -56,7 +56,7 @@ void TreeNode::draw(SDL_Renderer* rdrRenderer, Physics::Vector2D v2Offset) {
   SDL_Color colBackground;
   
   if(this->selected()) {
-    colBackground = {128, 0, 0, 255};
+    colBackground = {255, 200, 200, 255};
   } else {
     colBackground = this->backgroundColor();
   }

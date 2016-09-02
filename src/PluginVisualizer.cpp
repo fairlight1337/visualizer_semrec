@@ -47,6 +47,9 @@ namespace semrec {
       if(m_expOwl) {
 	delete m_expOwl;
       }
+      
+      SDL_DestroyRenderer(m_rdrRenderer);
+      SDL_DestroyWindow(m_swnWindow);
     }
     
     TreeNode::Ptr PLUGIN_CLASS::addTreeNode(std::string strIdentifier) {
@@ -126,7 +129,7 @@ namespace semrec {
       
       if(SDL_Init(SDL_INIT_EVERYTHING) >= 0) {
 	if(TTF_Init() >= 0) {
-	  Drawable::s_ttfFont = TTF_OpenFont(Drawable::s_strFontFile.c_str(), 16);
+	  Drawable::s_ttfFont = TTF_OpenFont(Drawable::s_strFontFile.c_str(), 14);
 	  
 	  m_unWidth =  800;
 	  m_unHeight = 600;
@@ -245,7 +248,7 @@ namespace semrec {
     void PLUGIN_CLASS::draw() {
       SDL_GL_MakeCurrent(m_swnWindow, m_gxContext);
       
-      SDL_SetRenderDrawColor(m_rdrRenderer, 0, 0, 0, 255);
+      SDL_SetRenderDrawColor(m_rdrRenderer, 255, 255, 255, 255);
       SDL_RenderClear(m_rdrRenderer);
       
       this->draw(m_rdrRenderer, m_s2State.v2Position);
