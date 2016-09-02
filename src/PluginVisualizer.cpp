@@ -228,7 +228,6 @@ namespace semrec {
     void PLUGIN_CLASS::draw(SDL_Renderer* rdrRenderer) {
       if(m_tnTree) {
 	m_tnTree->draw(rdrRenderer);
-	this->drawTreeNode(rdrRenderer, m_tnTree, m_unWidth / 2, m_unHeight / 2);
       }
     }
     

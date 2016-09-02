@@ -107,8 +107,6 @@ namespace semrec {
       void draw();
       virtual void draw(SDL_Renderer* rdrRenderer) override;
       
-      void drawTreeNode(SDL_Renderer* rdrRenderer, TreeNode::Ptr tnDraw, int nX, int nY);
-      
       void setZoom(double dZoom);
       double zoom();
       
