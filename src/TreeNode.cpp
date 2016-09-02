@@ -86,7 +86,9 @@ void TreeNode::draw(SDL_Renderer* rdrRenderer, Physics::Vector2D v2Offset) {
     int nY2 = tnChild->y() - tnChild->height() / 2 + v2Offset.dY;
     
     if(nY2 > nY1) {
-      this->drawLine(rdrRenderer, nX1, nY1, nX2, nY2, {0, 128, 0, 255});
+      this->drawLine(rdrRenderer, nX1, nY1, nX1, (nY1 + nY2) / 2, {0, 0, 0, 255});
+      this->drawLine(rdrRenderer, nX1, (nY1 + nY2) / 2, nX2, (nY1 + nY2) / 2, {0, 0, 0, 255});
+      this->drawLine(rdrRenderer, nX2, (nY1 + nY2) / 2, nX2, nY2, {0, 0, 0, 255});
     }
   }
 }
