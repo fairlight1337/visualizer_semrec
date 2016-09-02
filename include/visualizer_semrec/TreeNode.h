@@ -63,6 +63,8 @@ public:
   void setY(int nY);
   int y();
   
+  void setState(Physics::State2D s2Set);
+  
   unsigned int branchWidth();
   void recalculatePositions(bool bRecurse = true);
   

@@ -111,6 +111,10 @@ int TreeNode::y() {
   return m_s2State.v2Position.dY;
 }
 
+void TreeNode::setState(Physics::State2D s2Set) {
+  m_s2State = s2Set;
+}
+
 unsigned int TreeNode::branchWidth() {
   unsigned int unWidth = m_unWidth;
   unsigned int unChildrenWidth = (m_vecChildren.size() > 0 ? (m_vecChildren.size() - 1) * m_nSiblingDistance : 0);
