@@ -168,6 +168,16 @@ namespace semrec {
       this->draw();
       
       double dElapsed = this->timeElapsed();
+      if(dElapsed < 0.016) { // 60 fps
+	double dDifference = 0.016 - dElapsed;
+	
+	struct timespec tsDuration;
+	tsDuration.tv_sec = 0;
+	tsDuration.tv_nsec = dDifference * 1000000000.0;
+	
+	nanosleep(&tsDuration, NULL);
+      }
+      
       Physics::applyPhysics(m_s2State, dElapsed);
       
       if(m_tnTree) {
