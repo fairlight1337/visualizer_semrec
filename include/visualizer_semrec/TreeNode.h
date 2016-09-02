@@ -32,6 +32,7 @@ private:
   const int m_nSiblingDistance = 20;
   
   Physics::State2D m_s2State;
+  Physics::State2D m_s2Goal;
   
 protected:
 public:
@@ -63,7 +64,7 @@ public:
   int y();
   
   unsigned int branchWidth();
-  void recalculatePositions();
+  void recalculatePositions(bool bRecurse = true);
   
   void applyPhysics(double dElapsed);
   

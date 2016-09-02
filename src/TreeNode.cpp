@@ -79,12 +79,21 @@ void TreeNode::draw(SDL_Renderer* rdrRenderer, Physics::Vector2D v2Offset) {
     int nXChild = unOffset;
     
     tnChild->draw(rdrRenderer, v2Offset);
-    this->drawLine(rdrRenderer, this->x() + v2Offset.dX, this->y() + this->height() / 2 + v2Offset.dY, tnChild->x() + v2Offset.dX, tnChild->y() - tnChild->height() / 2 + v2Offset.dY, {0, 128, 0, 255});
+    
+    int nX1 = this->x() + v2Offset.dX;
+    int nY1 = this->y() + this->height() / 2 + v2Offset.dY;
+    int nX2 = tnChild->x() + v2Offset.dX;
+    int nY2 = tnChild->y() - tnChild->height() / 2 + v2Offset.dY;
+    
+    if(nY2 > nY1) {
+      this->drawLine(rdrRenderer, nX1, nY1, nX2, nY2, {0, 128, 0, 255});
+    }
   }
 }
 
 void TreeNode::setX(int nX) {
-  m_s2State.v2Position.dX = nX;
+  m_s2Goal.v2Position.dX = nX;
+  //m_s2State.v2Position.dX = nX;
 }
 
 int TreeNode::x() {
@@ -92,7 +101,8 @@ int TreeNode::x() {
 }
 
 void TreeNode::setY(int nY) {
-  m_s2State.v2Position.dY = nY;
+  m_s2Goal.v2Position.dY = nY;
+  //m_s2State.v2Position.dY = nY;
 }
 
 int TreeNode::y() {
@@ -112,7 +122,7 @@ unsigned int TreeNode::branchWidth() {
   return unWidth;
 }
 
-void TreeNode::recalculatePositions() {
+void TreeNode::recalculatePositions(bool bRecurse) {
   std::vector<unsigned int> vecSizes;
   unsigned int unSize = 0;
   
@@ -134,14 +144,23 @@ void TreeNode::recalculatePositions() {
     
     tnChild->setY(this->y() + m_nLevelDistance);
     
-    tnChild->recalculatePositions();
+    if(bRecurse) {
+      tnChild->recalculatePositions();
+    }
   }
 }
 
 void TreeNode::applyPhysics(double dElapsed) {
+  double dK = 10.0;
+  
+  m_s2State.v2Velocity.dX = dK * (m_s2Goal.v2Position.dX - m_s2State.v2Position.dX);
+  m_s2State.v2Velocity.dY = dK * (m_s2Goal.v2Position.dY - m_s2State.v2Position.dY);
+  
   Physics::applyPhysics(m_s2State, dElapsed);
   
   for(TreeNode::Ptr tnChild : m_vecChildren) {
+    this->recalculatePositions(false);
+    
     tnChild->applyPhysics(dElapsed);
   }
 }
