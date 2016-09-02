@@ -156,6 +156,13 @@ namespace semrec {
       this->dispatchEvents();
       this->draw();
       
+      double dElapsed = this->timeElapsed();
+      Physics::applyPhysics(m_s2State, dElapsed);
+      
+      if(m_tnTree) {
+	m_tnTree->applyPhysics(dElapsed);
+      }
+      
       return resCycle;
     }
     

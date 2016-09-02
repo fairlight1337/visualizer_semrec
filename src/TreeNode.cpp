@@ -1,7 +1,7 @@
 #include <visualizer_semrec/TreeNode.h>
 
 
-TreeNode::TreeNode(std::string strIdentifier, unsigned int unWidth, unsigned int unHeight, SDL_Color colText, SDL_Color colBackground) : m_strIdentifier(strIdentifier), m_tnParent(nullptr), m_unWidth(unWidth), m_unHeight(unHeight), m_colText(colText), m_colBackground(colBackground) {
+TreeNode::TreeNode(std::string strIdentifier, unsigned int unWidth, unsigned int unHeight, SDL_Color colText, SDL_Color colBackground) : m_strIdentifier(strIdentifier), m_tnParent(nullptr), m_unWidth(unWidth), m_unHeight(unHeight), m_colText(colText), m_colBackground(colBackground), m_s2State({{0, 0}, {0, 0}}) {
 }
 
 TreeNode::~TreeNode() {
@@ -84,19 +84,19 @@ void TreeNode::draw(SDL_Renderer* rdrRenderer) {
 }
 
 void TreeNode::setX(int nX) {
-  m_nX = nX;
+  m_s2State.v2Position.dX = nX;
 }
 
 int TreeNode::x() {
-  return m_nX;
+  return m_s2State.v2Position.dX;
 }
 
 void TreeNode::setY(int nY) {
-  m_nY = nY;
+  m_s2State.v2Position.dY = nY;
 }
 
 int TreeNode::y() {
-  return m_nY;
+  return m_s2State.v2Position.dY;
 }
 
 unsigned int TreeNode::branchWidth() {
@@ -135,5 +135,13 @@ void TreeNode::recalculatePositions() {
     tnChild->setY(m_nY + m_nLevelDistance);
     
     tnChild->recalculatePositions();
+  }
+}
+
+void TreeNode::applyPhysics(double dElapsed) {
+  Physics::applyPhysics(m_s2State, dElapsed);
+  
+  for(TreeNode::Ptr tnChild : m_vecChildren) {
+    tnChild->applyPhysics(dElapsed);
   }
 }

@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 
+#include <visualizer_semrec/Physics.h>
 #include <visualizer_semrec/Drawable.h>
 
 
@@ -32,6 +33,8 @@ private:
   
   const int m_nLevelDistance = 50;
   const int m_nSiblingDistance = 20;
+  
+  Physics::State2D m_s2State;
   
 protected:
 public:
@@ -64,6 +67,8 @@ public:
   
   unsigned int branchWidth();
   void recalculatePositions();
+  
+  void applyPhysics(double dElapsed);
   
   template<class ... Args>
     static TreeNode::Ptr create(Args ... args) {

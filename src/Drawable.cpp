@@ -5,7 +5,7 @@ std::string Drawable::s_strFontFile = "";
 TTF_Font* Drawable::s_ttfFont = nullptr;
 
 
-Drawable::Drawable() {
+Drawable::Drawable() : m_dTimeLast(this->getSystemTimeStampPrecise()) {
 }
 
 Drawable::~Drawable() {
@@ -91,4 +91,12 @@ double Drawable::getSystemTimeStampPrecise() {
   auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
   
   return (double)(millis / 1000.0);
+}
+
+double Drawable::timeElapsed() {
+  double dTimeNow = this->getSystemTimeStampPrecise();
+  double dElapsed = dTimeNow - m_dTimeLast;
+  m_dTimeLast = dTimeNow;
+  
+  return dElapsed;
 }

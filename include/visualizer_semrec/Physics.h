@@ -26,7 +26,7 @@ public:
   Physics();
   ~Physics();
   
-  void applyPhysics(State2D& s2State, double dTimeElapsed);
+  static void applyPhysics(State2D& s2State, double dTimeElapsed);
   
   template<class ... Args>
     static Physics::Ptr create(Args ... args) {
